@@ -1,0 +1,15 @@
+ {
+  "name": "nava-customer-chat",
+  "version": "1.0.0",
+  "description": "NAVA Customer Chat Interface",
+  "main": "src/app.js",
+  "scripts": {
+    "dev": "live-server public --port=3000",
+    "build": "echo 'No build process needed for vanilla JS'",
+    "start": "live-server public --port=3000"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "live-server": "^1.2.2"
+  }
+}

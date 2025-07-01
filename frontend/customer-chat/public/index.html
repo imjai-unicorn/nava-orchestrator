@@ -1,0 +1,77 @@
+ 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NAVA Chat - AI Orchestrator</title>
+    <link rel="stylesheet" href="../src/styles/main.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <h1>🚀 NAVA - AI Orchestrator</h1>
+            <p>Intelligent AI model selection and routing</p>
+        </header>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Chat Area -->
+            <div class="chat-container">
+                <div class="chat-header">
+                    <h2>💬 Chat</h2>
+                    <div class="status-indicator" id="statusIndicator">
+                        <span class="status-dot"></span>
+                        <span>Connecting...</span>
+                    </div>
+                </div>
+                
+                <div class="chat-messages" id="chatMessages">
+                    <div class="welcome-message">
+                        <div class="message-bubble assistant">
+                            <div class="message-content">
+                                👋 สวัสดี! ฉันคือ NAVA - ระบบเลือก AI model อัตโนมัติ<br>
+                                ลองถามอะไรดูสิ ฉันจะเลือก AI ที่เหมาะสมที่สุดให้คุณ
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="chat-input-container">
+                    <div class="input-wrapper">
+                        <input type="text" id="messageInput" placeholder="พิมพ์ข้อความของคุณ..." maxlength="500">
+                        <button id="sendButton" class="send-button">
+                            <span>ส่ง</span>
+                        </button>
+                    </div>
+                    <div class="loading-indicator" id="loadingIndicator" style="display: none;">
+                        <div class="loading-dots">
+                            <span></span><span></span><span></span>
+                        </div>
+                        <span>NAVA กำลังเลือก AI และสร้างคำตอบ...</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Decision Panel -->
+            <div class="decision-panel">
+                <div class="panel-header">
+                    <h2>🧠 Decision Transparency</h2>
+                </div>
+                
+                <div class="decision-content" id="decisionContent">
+                    <div class="no-decision">
+                        <p>ส่งข้อความเพื่อดูกระบวนการตัดสินใจของ NAVA</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../src/services/api.js"></script>
+    <script src="../src/components/chat.js"></script>
+    <script src="../src/app.js"></script>
+</body>
+</html>

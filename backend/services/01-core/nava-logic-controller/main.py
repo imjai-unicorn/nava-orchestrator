@@ -40,17 +40,11 @@ async def process_chat(request: ChatRequest):
     """Main chat processing endpoint"""
     
     try:
-        # 1. Get or create conversation
+        # 1. Get or create conversation       
         if request.conversation_id:
             conversation_id = request.conversation_id
         else:
-            if db.is_connected():
-    # Create conversation logic here
-    conversation_id = "mock-conversation-id"  # Phase 1 mock
-else:
-    conversation_id = "mock-conversation-id"  # Fallback
-            if not conversation_id:
-                raise HTTPException(status_code=500, detail="Failed to create conversation")
+            conversation_id = await db.save_conversation("New Conversation")
         
         # 2. Decide which model to use
         decision = await decision_engine.decide_model(request.message)

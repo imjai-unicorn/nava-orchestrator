@@ -1,6 +1,6 @@
-# 🚀 NAVA - AI Orchestrator
+# 🚀 NAVA - Logic Orchestrator
 
-Intelligent AI model selection and routing system.
+Intelligent Logic model selection and routing system.
 
 ## 🎯 Phase 1 Complete
 

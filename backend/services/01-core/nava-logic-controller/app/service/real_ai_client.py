@@ -10,12 +10,12 @@ import asyncio
 from typing import Dict, Any, Optional
 from datetime import datetime
 import asyncio
-from tenacity import retry, stop_after_attempt, wait_exponential
+#from tenacity import retry, stop_after_attempt, wait_exponential
 
-@retry(
-    stop=stop_after_attempt(3),
-    wait=wait_exponential(multiplier=1, min=4, max=10)
-)
+#retry(
+#    stop=stop_after_attempt(3),
+#    wait=wait_exponential(multiplier=1, min=4, max=10)
+#)
 async def call_claude_with_retry(prompt: str):
     """Call Claude with retry logic for overload handling"""
     try:

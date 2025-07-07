@@ -112,4 +112,4 @@ class PerformanceMonitor:
             }
 
 # Global monitor instance
-monitor = PerformanceMonitor()
+monitor = PerformanceMonitor()"# test change" 

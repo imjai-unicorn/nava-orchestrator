@@ -18,7 +18,7 @@ client = anthropic.Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
 class ChatRequest(BaseModel):
     message: str
     user_id: str
-    model: str = "claude-3-sonnet-20240229"
+    model: str = "claude-3-5-sonnet-20241022"
     max_tokens: int = 1000
     temperature: float = 0.7
 
@@ -57,12 +57,13 @@ async def chat_with_claude(request: ChatRequest):
         
         # Validate model
         valid_models = [
+            "claude-3-5-sonnet-20241022",
+            "claude-3-5-haiku-20241022", 
             "claude-3-opus-20240229",
-            "claude-3-sonnet-20240229", 
-            "claude-3-haiku-20240307"
+            "claude-3-5-sonnet-20240229"
         ]
         if request.model not in valid_models:
-            request.model = "claude-3-sonnet-20240229"
+            request.model = "claude-3-5-sonnet-20241022"
         
         # Create system message for NAVA context
         system_message = """You are NAVA, an advanced AI assistant powered by Claude. You excel at:
@@ -212,16 +213,16 @@ async def list_supported_models():
                 "strengths": ["Complex reasoning", "Creative writing", "Detailed analysis"]
             },
             {
-                "id": "claude-3-sonnet-20240229",
-                "name": "Claude 3 Sonnet", 
+                "id": "claude-3-5-sonnet-20241022",
+                "name": "Claude 3-5 Sonnet", 
                 "description": "Balanced model for most tasks",
                 "max_tokens": 4096,
                 "cost_per_1k_tokens": 0.003,
                 "strengths": ["General tasks", "Coding", "Analysis"]
             },
             {
-                "id": "claude-3-haiku-20240307",
-                "name": "Claude 3 Haiku",
+                "id": "claude-3-5-haiku-20241022",
+                "name": "Claude 3-5 Haiku",
                 "description": "Fastest model for simple tasks",
                 "max_tokens": 4096,
                 "cost_per_1k_tokens": 0.00025,

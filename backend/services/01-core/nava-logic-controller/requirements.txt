@@ -1,5 +1,44 @@
+# requirements.txt - Updated for Real AI Integration
+
+# FastAPI and web framework
 fastapi==0.104.1
 uvicorn[standard]==0.24.0
-supabase==2.3.0
 pydantic==2.5.0
-python-dotenv==1.0.0
+
+# HTTP client for AI service calls
+aiohttp==3.9.1
+httpx==0.25.2
+
+# Database (Supabase)
+supabase==2.3.4
+postgrest==0.13.2
+
+# Async support
+asyncio-mqtt==0.16.1
+
+# Logging and monitoring
+structlog==23.2.0
+python-json-logger==2.0.7
+
+# Environment and configuration
+python-decouple==3.8
+pydantic-settings==2.1.0
+
+# Date/time handling
+python-dateutil==2.8.2
+
+# Utilities
+typing-extensions==4.8.0
+requests==2.31.0
+
+# Development and testing
+pytest==7.4.3
+pytest-asyncio==0.21.1
+pytest-mock==3.12.0
+httpx==0.25.2  # For testing
+
+# Optional: Redis for caching/rate limiting (future use)
+redis==5.0.1
+
+# Optional: Monitoring
+prometheus-client==0.19.0

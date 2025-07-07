@@ -1,10 +1,12 @@
 import os
+from supabase import create_client, Client
 from typing import Optional
+from datetime import datetime
+import json
 
-# Simple mock for Railway compatibility
 class SupabaseManager:
     def __init__(self):
-        self.client = None
+        self.client: Optional[Client] = None
         self._initialize_client()
     
     def _initialize_client(self):
@@ -14,25 +16,18 @@ class SupabaseManager:
             key = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
             
             if not url or not key:
-                print("Warning: Supabase credentials not found - using mock mode")
-                self.client = None
-                return
+                print("Warning: Supabase credentials not found")
+                return None
             
-            # Try to import and create Supabase client
-            try:
-                from supabase import create_client
-                self.client = create_client(url, key)
-                print("✅ Supabase client initialized successfully")
-            except Exception as import_error:
-                print(f"⚠️ Supabase import error: {import_error}")
-                print("Using mock mode for compatibility")
-                self.client = None
+            # Simple client creation without proxy
+            self.client = create_client(url, key)
+            print("✅ Supabase client initialized successfully")
             
         except Exception as e:
             print(f"❌ Failed to initialize Supabase client: {e}")
             self.client = None
     
-    def get_client(self):
+    def get_client(self) -> Optional[Client]:
         """Get Supabase client instance"""
         return self.client
     
@@ -43,8 +38,7 @@ class SupabaseManager:
     async def test_connection(self) -> bool:
         """Test database connection"""
         if not self.client:
-            print("⚠️ Supabase not connected - using mock mode")
-            return True  # Return True for mock mode
+            return False
         
         try:
             # Simple test query
@@ -53,14 +47,65 @@ class SupabaseManager:
         except Exception as e:
             print(f"❌ Supabase connection test failed: {e}")
             return False
-    
-    async def save_conversation(self, title: str) -> str:
-        """Save conversation - mock implementation"""
-        return f"mock-conversation-{hash(title) % 1000}"
-    
-    async def save_message(self, conversation_id: str, message: str, response: str) -> str:
-        """Save message - mock implementation"""
-        return f"mock-message-{hash(message) % 1000}"
+
 
 # Global instance
 supabase_manager = SupabaseManager()
+
+async def save_conversation(self, conversation_data: dict) -> dict:
+    """Save conversation to Supabase - เพิ่ม method ที่หายไป"""
+    if not self.client:
+        return {"success": False, "error": "No Supabase connection"}
+    
+    try:
+        # Prepare conversation data
+        data = {
+            "conversation_id": conversation_data.get("conversation_id"),
+            "user_id": conversation_data.get("user_id"), 
+            "user_message": conversation_data.get("user_input"),
+            "ai_response": conversation_data.get("ai_response"),
+            "selected_model": conversation_data.get("selected_model"),
+            "confidence": conversation_data.get("confidence"),
+            "reasoning": json.dumps(conversation_data.get("reasoning", {})),
+            "behavior_pattern": conversation_data.get("behavior_pattern"),
+            "task_type": conversation_data.get("task_type"),
+            "complexity_score": conversation_data.get("complexity_score"),
+            "processing_time_ms": conversation_data.get("processing_time_ms"),
+            "created_at": datetime.utcnow().isoformat()
+        }
+        
+        # Insert to conversations table
+        result = self.client.table("conversations").insert(data).execute()
+        
+        return {
+            "success": True,
+            "conversation_id": conversation_data.get("conversation_id"),
+            "record_id": result.data[0]["id"] if result.data else None
+        }
+        
+    except Exception as e:
+        print(f"❌ Error saving conversation: {str(e)}")
+        return {
+            "success": False,
+            "error": str(e),
+            "conversation_id": conversation_data.get("conversation_id")
+        }
+
+async def get_conversation_history(self, user_id: str, limit: int = 10):
+    """Get conversation history for user"""
+    if not self.client:
+        return []
+    
+    try:
+        result = self.client.table("conversations")\
+            .select("*")\
+            .eq("user_id", user_id)\
+            .order("created_at", desc=True)\
+            .limit(limit)\
+            .execute()
+        
+        return result.data
+        
+    except Exception as e:
+        print(f"❌ Error getting conversation history: {str(e)}")
+        return []

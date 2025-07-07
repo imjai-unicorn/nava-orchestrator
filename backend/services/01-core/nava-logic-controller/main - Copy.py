@@ -164,22 +164,6 @@ async def enhanced_chat_endpoint(request: ChatRequest):
             decision_info={"error": str(e), "error_type": "processing_error"},
             timestamp=datetime.now().isoformat()
         )
-@app.post("/v2/complex-chat", response_model=ChatResponse)
-async def complex_chat(request: ChatRequest):
-    from app.core.decision_engine import DecisionContext  # ใส่ในฟังก์ชันหากยังไม่ import ข้างบน
-
-    context = DecisionContext(
-        user_id=request.user_id,
-        user_preferences={"preferred_model": request.user_preference},
-        conversation_history=[{"message": request.message}],
-        complexity_level="complex"
-    )
-    result = await orchestrator.process_complex_request(
-        message=request.message,
-        context=context,
-        approval_level=UserApprovalLevel(request.approval_level)
-    )
-    return ChatResponse(**result)
 
 # Enhanced health check
 @app.get("/health", response_model=HealthResponse)

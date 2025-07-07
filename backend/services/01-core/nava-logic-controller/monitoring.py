@@ -1,6 +1,5 @@
-# monitoring.py - Simple Performance Monitor
+# monitoring.py - NO PSUTIL VERSION
 import time
-import psutil
 from datetime import datetime
 from typing import Dict, Any
 import logging
@@ -8,7 +7,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 class PerformanceMonitor:
-    """Simple performance monitoring for NAVA"""
+    """Simple performance monitoring for NAVA - NO PSUTIL"""
     
     def __init__(self):
         self.metrics = {
@@ -16,10 +15,9 @@ class PerformanceMonitor:
             "response_times": [],
             "ai_model_usage": {},
             "error_count": 0,
-            "start_time": datetime.now(),
-            "endpoint_stats": {}
+            "start_time": datetime.now()
         }
-        logger.info("✅ Performance Monitor initialized")
+        logger.info("✅ Performance Monitor initialized (no psutil)")
     
     def track_request(self, endpoint: str, response_time: float, ai_model: str = None):
         """Track each request performance"""
@@ -27,9 +25,9 @@ class PerformanceMonitor:
             self.metrics["request_count"] += 1
             self.metrics["response_times"].append(response_time)
             
-            # Keep only last 1000 records
-            if len(self.metrics["response_times"]) > 1000:
-                self.metrics["response_times"] = self.metrics["response_times"][-1000:]
+            # Keep only last 100 records
+            if len(self.metrics["response_times"]) > 100:
+                self.metrics["response_times"] = self.metrics["response_times"][-100:]
             
             # Track AI model usage
             if ai_model:
@@ -44,12 +42,11 @@ class PerformanceMonitor:
         """Track errors"""
         try:
             self.metrics["error_count"] += 1
-            logger.warning(f"Error tracked: {error_type} on {endpoint}")
         except Exception as e:
             logger.error(f"Error tracking error: {e}")
     
     def get_metrics(self) -> Dict[str, Any]:
-        """Get current performance metrics"""
+        """Get current performance metrics - NO SYSTEM STATS"""
         try:
             # Calculate averages
             avg_response_time = 0
@@ -58,14 +55,6 @@ class PerformanceMonitor:
             
             # Calculate uptime
             uptime_seconds = (datetime.now() - self.metrics["start_time"]).total_seconds()
-            
-            # Get system stats safely
-            try:
-                memory_mb = psutil.Process().memory_info().rss / 1024 / 1024
-                cpu_percent = psutil.cpu_percent()
-            except:
-                memory_mb = 0
-                cpu_percent = 0
             
             return {
                 "status": "healthy",
@@ -76,13 +65,10 @@ class PerformanceMonitor:
                 "average_response_time_ms": round(avg_response_time * 1000, 2),
                 "error_count": self.metrics["error_count"],
                 "ai_model_usage": self.metrics["ai_model_usage"],
-                "uptime_hours": round(uptime_seconds / 3600, 2),
-                "memory_usage_mb": round(memory_mb, 2),
-                "cpu_percent": cpu_percent
+                "uptime_hours": round(uptime_seconds / 3600, 2)
             }
             
         except Exception as e:
-            logger.error(f"Error getting metrics: {e}")
             return {
                 "status": "error",
                 "error": str(e),
@@ -100,7 +86,6 @@ class PerformanceMonitor:
                 "total_requests": metrics["total_requests"],
                 "error_rate": f"{error_rate:.2f}%",
                 "uptime": f"{metrics['uptime_hours']:.1f} hours",
-                "memory_mb": metrics["memory_usage_mb"],
                 "timestamp": datetime.now().isoformat()
             }
             

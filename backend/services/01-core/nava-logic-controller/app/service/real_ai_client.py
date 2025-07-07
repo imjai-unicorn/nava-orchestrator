@@ -9,6 +9,27 @@ import httpx
 import asyncio
 from typing import Dict, Any, Optional
 from datetime import datetime
+import asyncio
+from tenacity import retry, stop_after_attempt, wait_exponential
+
+@retry(
+    stop=stop_after_attempt(3),
+    wait=wait_exponential(multiplier=1, min=4, max=10)
+)
+async def call_claude_with_retry(prompt: str):
+    """Call Claude with retry logic for overload handling"""
+    try:
+        # เรียก Claude API ตามปกติ
+        response = await claude_api_call(prompt)
+        return response
+    except Exception as e:
+        if "overloaded_error" in str(e) or "529" in str(e):
+            print(f"⚠️ Claude overloaded, retrying...")
+            raise e  # Retry will handle this
+        else:
+            # ถ้าเป็น error อื่น ให้ fallback ไป GPT
+            print(f"🔄 Claude error, falling back to GPT: {e}")
+            return await call_gpt_fallback(prompt)
 
 logger = logging.getLogger(__name__)
 
@@ -33,7 +54,20 @@ class RealAIClient:
     async def initialize(self):
         """Initialize client"""
         logger.info("🔗 Real AI Client initialized - ready for HTTP calls")
-        
+    async def call_ai(self, model: str, message: str, context: Dict[str, Any] = None) -> Dict[str, Any]:
+        """Call AI with fallback for Claude overload"""
+    
+        # Claude overload protection
+        if model == "claude":
+            try:
+                result = await self._call_claude_with_retry(message, context)
+                return result
+            except Exception as e:
+                if "overload" in str(e).lower() or "529" in str(e):
+                    logger.warning("⚠️ Claude overloaded, falling back to GPT")
+                    return await self._call_gpt_fallback(message, context)
+                raise e    
+     
     async def call_ai(self, model: str, message: str, context: Dict[str, Any] = None) -> Dict[str, Any]:
         """
         Call AI service via HTTP

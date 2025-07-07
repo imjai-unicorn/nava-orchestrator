@@ -16,6 +16,8 @@ class UserApprovalLevel(Enum):
 # Import Enhanced NAVA Components
 from app.core.controller import NAVAController
 from app.service.logic_orchestrator import LogicOrchestrator
+import time
+from monitoring import monitor
 
 # Configure logging
 logging.basicConfig(
@@ -39,7 +41,30 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
+@app.middleware("http")
+async def performance_tracking_middleware(request, call_next):
+    """Track performance for all requests"""
+    start_time = time.time()
+    
+    try:
+        response = await call_next(request)
+        response_time = time.time() - start_time
+        
+        # Track successful request
+        monitor.track_request(
+            endpoint=request.url.path,
+            response_time=response_time
+        )
+        
+        return response
+        
+    except Exception as e:
+        # Track error
+        monitor.track_error(
+            error_type=type(e).__name__,
+            endpoint=request.url.path
+        )
+        raise e
 # Pydantic models
 class ChatRequest(BaseModel):
     message: str = Field(..., min_length=1, max_length=10000)
@@ -116,6 +141,8 @@ async def enhanced_chat_endpoint(request: ChatRequest):
         
         # Process through Enhanced NAVA
         if orchestrator and orchestrator.is_initialized:
+            # Track AI model usage ⭐
+            ai_start_time = time.time()
             result = await orchestrator.process_request(
                 message=request.message,
                 user_id=request.user_id,
@@ -123,7 +150,15 @@ async def enhanced_chat_endpoint(request: ChatRequest):
                 context=request.context,
                 approval_level=approval_level
             )
-        else:
+            ai_response_time = time.time() - ai_start_time
+    
+            # Track which AI model was used ⭐
+            monitor.track_request(
+                endpoint="ai_processing",
+                response_time=ai_response_time,
+                ai_model=result.get("model_used", "unknown")
+            )
+        else:  # ✅ ตอนนี้ match กับ if แล้ว
             # Enhanced fallback
             result = {
                 "response": f"Enhanced NAVA fallback: {request.message}",

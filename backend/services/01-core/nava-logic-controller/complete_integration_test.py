@@ -122,12 +122,12 @@ async def test_3_enhanced_decision_logic():
         for message, expected_model, expected_pattern in test_cases:
             try:
                 selected_model, confidence, reasoning = engine.select_model(message)
-                
+
                 model_correct = selected_model == expected_model
                 pattern_detected = reasoning.get("behavior_analysis", {}).get("detected_pattern")
-                success = model_correct and (confidence > 0.6)
-                
+                confidence_good = confidence > 0.6  # ✅ define confidence_good
                 success = model_correct and confidence_good
+
                 results.append(success)
                 
                 details = f"Model: {selected_model} (exp: {expected_model}), Confidence: {confidence:.2f}, Pattern: {pattern_detected}"

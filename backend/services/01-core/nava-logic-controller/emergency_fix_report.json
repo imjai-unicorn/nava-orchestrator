@@ -1,0 +1,15 @@
+{
+  "timestamp": "2025-07-12T09:48:14.356544",
+  "issues_found": [
+    "gpt_timeout_too_long",
+    "claude_timeout_too_long",
+    "gemini_timeout_too_long"
+  ],
+  "fixes_applied": [
+    "updated_timeout_settings_direct",
+    "forced_exit_emergency"
+  ],
+  "recommendations": [
+    "\u26a1 Reduce timeout settings in circuit breaker"
+  ]
+}

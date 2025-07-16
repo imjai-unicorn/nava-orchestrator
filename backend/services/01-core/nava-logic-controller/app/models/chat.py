@@ -6,6 +6,7 @@ class ChatRequest(BaseModel):
     conversation_id: Optional[str] = None
 
 class ChatResponse(BaseModel):
+    model_config = {"protected_namespaces": ()}
     response: str
     model_used: str
     confidence: float

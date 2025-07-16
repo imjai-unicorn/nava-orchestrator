@@ -3,8 +3,82 @@ import time
 from datetime import datetime
 from typing import Dict, Any
 import logging
+from fastapi import APIRouter
+import sys # Import sys
+import os  # Import os
+
+current_file_dir = os.path.dirname(os.path.abspath(__file__))
+# current_file_dir -> E:\nava-projects\backend\services\01-core\nava-logic-controller
+
+# Path to 'app' directory (e.g., E:\nava-projects\backend\services\01-core\nava-logic-controller\app)
+app_dir = os.path.join(current_file_dir, 'app')
+
+if app_dir not in sys.path:
+    sys.path.insert(0, app_dir)
+
+print(f"🔍 Current monitoring file dir: {current_file_dir}")
+print(f"🔍 Adding app_dir to sys.path: {app_dir}")
+# --- END PATH SETUP ---
+
+# เปลี่ยนจาก relative import เป็น absolute import
+from app.service.logic_orchestrator import LogicOrchestrator
+router = APIRouter()
+# Initializing orchestrator globally might have implications for state management
+# in a production FastAPI app. Consider using dependency injection.
+orchestrator = LogicOrchestrator()
 
 logger = logging.getLogger(__name__)
+
+@router.get("/health")
+async def get_system_health():
+    """Get current system health and stabilization status"""
+    # ensure orchestrator is initialized if needed
+    if not orchestrator.is_initialized:
+        await orchestrator.initialize() # Call initialize if not already
+    return orchestrator.get_system_status()
+
+@router.get("/cache/stats")
+async def get_cache_stats():
+    """Get cache performance statistics"""
+    if orchestrator.cache_manager: # Check if cache_manager is initialized
+        return orchestrator.cache_manager.get_cache_stats()
+    return {"status": "Cache Manager not available"}
+
+@router.get("/features/status")
+async def get_feature_status():
+    """Get feature activation status"""
+    if orchestrator.feature_manager: # Check if feature_manager is initialized
+        return orchestrator.feature_manager.get_feature_status()
+    return {"status": "Feature Manager not available"}
+
+@router.post("/features/{feature_name}/enable")
+async def enable_feature(feature_name: str):
+    """Force enable a feature (admin only)"""
+    if orchestrator.feature_manager: # Check if feature_manager is initialized
+        # In feature_flags.py, force_enable is a method of ProgressiveFeatureManager
+        # And there's a global function force_enable_feature that calls it.
+        # So either call orchestrator.feature_manager.force_enable(feature_name)
+        # or import and use the global force_enable_feature directly.
+        # Based on monitoring.py, it expects a method on feature_manager directly.
+        success = orchestrator.feature_manager.force_enable(feature_name) # Corrected to .force_enable()
+        return {"success": success, "feature": feature_name, "status": "enabled"}
+    return {"success": False, "message": "Feature Manager not available"}
+
+@router.post("/features/{feature_name}/disable")
+async def disable_feature(feature_name: str):
+    """Force disable a feature (admin only)"""
+    if orchestrator.feature_manager: # Check if feature_manager is initialized
+        success = orchestrator.feature_manager.force_disable(feature_name) # Corrected to .force_disable()
+        return {"success": success, "feature": feature_name, "status": "disabled"}
+    return {"success": False, "message": "Feature Manager not available"}
+
+@router.post("/cache/clear")
+async def clear_cache():
+    """Clear response cache (admin only)"""
+    if orchestrator.cache_manager: # Check if cache_manager is initialized
+        orchestrator.cache_manager.clear_cache()
+        return {"success": True, "message": "Cache cleared"}
+    return {"success": False, "message": "Cache Manager not available"}
 
 class PerformanceMonitor:
     """Simple performance monitoring for NAVA - NO PSUTIL"""

@@ -23,12 +23,35 @@ try:
 except:
     RealAIClient = None
 
+# Safe imports with fallbacks
+try:
+    from .service_discovery import ServiceDiscovery
+except:
+    ServiceDiscovery = None
+
+try:
+    from .real_ai_client import RealAIClient
+except:
+    RealAIClient = None
+
 try:
     from app.core.decision_engine import EnhancedDecisionEngine, WorkflowMode
 except:
     EnhancedDecisionEngine = None
     WorkflowMode = None
 
+# Import feature flags
+try:
+    from app.core.feature_flags import (
+        is_feature_enabled,
+        record_feature_usage,
+        get_feature_status,
+        force_enable_feature
+    )
+    FEATURE_FLAGS_AVAILABLE = True
+except ImportError:
+    FEATURE_FLAGS_AVAILABLE = False
+    
 logger = logging.getLogger(__name__)
 
 class UserApprovalLevel(Enum):
@@ -49,7 +72,7 @@ class LogicOrchestrator:
         self.config = config or {}
         
         # 🚨 EMERGENCY: Disable all complex features that cause recursion
-        self._emergency_mode = True
+        self._emergency_mode = False
         self._processing_lock = asyncio.Lock()
         
         # Safe component initialization
@@ -117,7 +140,15 @@ class LogicOrchestrator:
             self.metrics["total_requests"] += 1
             self.metrics["emergency_mode_count"] += 1
 
-            logger.info(f"🚨 EMERGENCY processing request for user: {user_id}")
+            mode_text = "EMERGENCY" if self._emergency_mode else "ENHANCED"
+            logger.info(f"🎯 {mode_text} processing request for user: {user_id}")
+
+            # 🔒 CHECK IF ADVANCED FEATURES CAN BE ENABLED
+            if FEATURE_FLAGS_AVAILABLE:
+                advanced_enabled = await is_feature_enabled("enhanced_decision_engine", user_id)
+                if advanced_enabled:
+                    logger.info("🎯 Advanced features enabled - using enhanced processing")
+                    await record_feature_usage("enhanced_decision_engine", True)
 
             try:
                 # 1. DIRECT MODEL SELECTION (no complex decision engine)
@@ -145,26 +176,22 @@ class LogicOrchestrator:
         
         # Priority 1: User preference
         if user_preference and user_preference in ["gpt", "claude", "gemini"]:
-            # 🚨 BYPASS CLAUDE if explicitly requested
-            if user_preference == "claude":
-                logger.warning("🚨 Bypassing Claude user preference to prevent recursion")
-                return "gpt"
             return user_preference
         
         # Priority 2: Simple keyword matching
         message_lower = message.lower()
-       
+    
         # Claude for writing/analysis
-        if any(word in message_lower for word in ["write", "analyze", "create", "เขียน", "วิเคราะห์"]):
-            return "gpt"
+        if any(word in message_lower for word in ["write", "analyze", "create", "เขียน", "วิเคราะห์", "comprehensive", "complex"]):
+            return "claude"
         
         # Gemini for strategy/planning
-        if any(word in message_lower for word in ["plan", "strategy", "แผน", "กลยุทธ์"]):
-            return "gpt"
+        if any(word in message_lower for word in ["plan", "strategy", "แผน", "กลยุทธ์", "strategic", "business"]):
+            return "gemini"
         
         # GPT for everything else (default)
         return "gpt"
- 
+    
     async def _emergency_ai_call(self, model: str, message: str, context: Dict[str, Any]) -> Dict[str, Any]:
         """🚨 EMERGENCY: Direct AI call with COMPLETE recursion protection"""
     
@@ -178,7 +205,14 @@ class LogicOrchestrator:
     
         # 🔒 INCREMENT DEPTH
         self._ai_call_stack[call_key] = current_depth + 1
-    
+        
+        # 🔒 IMPORT CIRCUIT BREAKER
+        try:
+            from backend.shared.common import call_ai_with_protection
+            CIRCUIT_BREAKER_AVAILABLE = True
+        except ImportError:
+            CIRCUIT_BREAKER_AVAILABLE = False
+
         try:
             # 🚨 MODEL BYPASS for problematic models
             if model.lower() == "claude" and current_depth > 0:
@@ -188,11 +222,13 @@ class LogicOrchestrator:
         
             if self.ai_client:
                 try:
-                    # 🔒 TIMEOUT + RECURSION PROTECTION
-                    result = await asyncio.wait_for(
-                        self.ai_client.call_ai(model, message, context),
-                        timeout=15.0  # Reduced timeout for faster failure
-                    )
+                    if CIRCUIT_BREAKER_AVAILABLE:
+                        result = await call_ai_with_protection(model, self.ai_client.call_ai, message, context)
+                    else:
+                        result = await asyncio.wait_for(
+                            self.ai_client.call_ai(model, message, context),
+                            timeout=15.0
+                        )
 
                     # Ensure it's a proper dict
                     if not isinstance(result, dict):
@@ -334,13 +370,13 @@ class LogicOrchestrator:
             "model_used": model,
             "confidence": ai_result.get("confidence", 0.7),
             "processing_time_seconds": processing_time,
-            "orchestration_type": "emergency_direct",
-            "workflow_used": False,
-            "emergency_mode": True,
+            "orchestration_type": "enhanced" if not self._emergency_mode else "emergency_direct",
+            "workflow_used": not self._emergency_mode,
+            "emergency_mode": self._emergency_mode,
             "decision_info": {
-                "method": "emergency_simple_selection",
+                "method": "enhanced_selection" if not self._emergency_mode else "emergency_simple_selection",
                 "model_selected": model,
-                "emergency_mode_active": True
+                "emergency_mode_active": self._emergency_mode
             },
             "timestamp": datetime.now().isoformat()
         }

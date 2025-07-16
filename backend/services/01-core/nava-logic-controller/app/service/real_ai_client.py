@@ -10,12 +10,25 @@ import asyncio
 from typing import Dict, Any, Optional
 from datetime import datetime
 import asyncio
-#from tenacity import retry, stop_after_attempt, wait_exponential
 
-#retry(
-#    stop=stop_after_attempt(3),
-#    wait=wait_exponential(multiplier=1, min=4, max=10)
-#)
+async def call_ai_with_simple_retry(self, model: str, message: str, context: Dict[str, Any] = None):
+    """Call AI with simple retry logic (no tenacity needed)"""
+    
+    # First attempt
+    try:
+        return await self.call_ai(model, message, context)
+    except Exception as e:
+        logger.warning(f"First attempt failed for {model}: {e}")
+        
+        # Second attempt
+        try:
+            return await self.call_ai(model, message, context)
+        except Exception as e2:
+            logger.error(f"Second attempt failed for {model}: {e2}")
+            
+            # Return error response
+            return self._error_response(str(e2), model)
+        
 async def call_claude_with_retry(prompt: str):
     """Call Claude with retry logic for overload handling"""
     try:

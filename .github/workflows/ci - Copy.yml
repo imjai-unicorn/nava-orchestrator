@@ -27,17 +27,12 @@ jobs:
     
     - name: Run tests
       run: |
-        echo "Phase 2 tests completed manually - skipping automated tests"
-        echo "17/17 tests passed (100%)"
-        echo "Tests: Decision Engine, Quality Service, SLF Framework, Cache Engine"
-        # pytest tests/ -v --cov=backend/ --cov-report=xml
+        pytest tests/ -v --cov=src/ --cov-report=xml
     
     - name: Upload coverage
-      run: |
-        echo "Coverage report skipped for Phase 2"
-      # uses: codecov/codecov-action@v3
-      # with:
-      #   file: ./coverage.xml
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage.xml
 
   security-scan:
     runs-on: ubuntu-latest
@@ -47,6 +42,4 @@ jobs:
       run: |
         pip install safety bandit
         safety check -r requirements.txt
-        echo "Security scan: Basic checks passed"
-        echo "Bandit scan: Skipped for Phase 2 (no critical issues)"
-        # bandit -r backend/
+        bandit -r src/

@@ -228,17 +228,13 @@ class ProgressiveFeatureManager:
         logger.info(f"✅ Initialized {len(self.features)} NAVA features")
     
     def _start_monitoring(self):
-        """Start feature monitoring task - FIXED VERSION"""
+        """Start feature monitoring task"""
         try:
-            try:
-                loop = asyncio.get_running_loop()
-                if self._monitoring_task is None or self._monitoring_task.done():
-                    self._monitoring_task = loop.create_task(self._monitor_features())
-                    logger.info("✅ Feature monitoring started")
-            except RuntimeError:
-                logger.info("💤 Feature monitoring deferred: no event loop running")
-                self._monitoring_task = None
+            if self._monitoring_task is None or self._monitoring_task.done():
+                self._monitoring_task = asyncio.create_task(self._monitor_features())
+                logger.info("✅ Feature monitoring started")
         except Exception as e:
+            # Log error but don't fail initialization
             logger.debug(f"💤 Feature monitoring deferred: {e}")
             self._monitoring_task = None
     

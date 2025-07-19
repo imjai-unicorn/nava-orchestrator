@@ -1,5 +1,5 @@
 # complete_integration_test.py
-"""
+r"""
 Complete NAVA Integration Test - ตรวจสอบทุกอย่างก่อน Production
 วางไฟล์นี้ใน E:\nava-projects\backend\services\01-core\nava-logic-controller\
 """
@@ -10,6 +10,7 @@ import httpx
 import json
 from datetime import datetime
 from pathlib import Path
+import pytest
 
 def print_header(title):
     print(f"\n{'='*60}")
@@ -22,6 +23,7 @@ def print_result(test_name, success, message, details=""):
     if details:
         print(f"   └─ {details}")
 
+@pytest.mark.asyncio
 async def test_1_file_structure():
     """ตรวจสอบไฟล์ทั้งหมดมีครบไหม"""
     print_header("File Structure Check")
@@ -48,6 +50,7 @@ async def test_1_file_structure():
     
     return all_exist, results
 
+@pytest.mark.asyncio
 async def test_2_imports():
     """ตรวจสอบ Enhanced Imports"""
     print_header("Enhanced Imports Test")
@@ -102,6 +105,7 @@ async def test_2_imports():
     
     return overall_success, import_tests
 
+@pytest.mark.asyncio
 async def test_3_enhanced_decision_logic():
     """ตรวจสอบ Enhanced Decision Logic"""
     print_header("Enhanced Decision Logic Test")
@@ -147,6 +151,7 @@ async def test_3_enhanced_decision_logic():
         print_result("Decision Logic Test", False, f"Setup failed: {e}")
         return False, []
 
+@pytest.mark.asyncio
 async def test_4_ai_services_connectivity():
     """ตรวจสอบการเชื่อมต่อ AI Services"""
     print_header("AI Services Connectivity Test")
@@ -195,6 +200,7 @@ async def test_4_ai_services_connectivity():
     
     return all_working, results
 
+@pytest.mark.asyncio
 async def test_5_nava_orchestrator():
     """ตรวจสอบ NAVA Orchestrator รวม"""
     print_header("NAVA Orchestrator Integration Test")
@@ -244,6 +250,7 @@ async def test_5_nava_orchestrator():
         print_result("Orchestrator Test", False, f"Failed: {e}")
         return False, {"error": str(e)}
 
+@pytest.mark.asyncio
 async def test_6_nava_api_integration():
     """ตรวจสอบ NAVA API รวม (ถ้า server รันอยู่)"""
     print_header("NAVA API Integration Test")
@@ -324,6 +331,7 @@ async def test_6_nava_api_integration():
         print_result("NAVA API Test", False, f"Connection failed: {e}")
         return False, {"connection_error": str(e)}
 
+@pytest.mark.asyncio
 async def test_7_advanced_complexity_analysis():
     """ทดสอบ Advanced Complexity Analysis"""
     print_header("Advanced Complexity Analysis Test")
@@ -367,6 +375,7 @@ async def test_7_advanced_complexity_analysis():
         print_result("Complexity Analysis Test", False, f"Setup failed: {e}")
         return False, {"error": str(e)}
 
+@pytest.mark.asyncio
 async def test_8_advanced_orchestration():
     """ทดสอบ Advanced Orchestration"""
     print_header("Advanced Orchestration Test")

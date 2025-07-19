@@ -1,9 +1,10 @@
-# requirements.txt - Updated for Real AI Integration
+# requirements.txt - Updated for Real AI Integration (Security Fixed)
 
 # FastAPI and web framework
 fastapi==0.104.1
 uvicorn[standard]==0.24.0
 pydantic==2.5.0
+python-multipart==0.0.6
 
 # HTTP client for AI service calls
 aiohttp==3.9.1
@@ -35,19 +36,12 @@ requests==2.31.0
 pytest==7.4.3
 pytest-asyncio==0.21.1
 pytest-mock==3.12.0
-httpx==0.25.2  # For testing
 
-# Optional: Redis for caching/rate limiting (future use)
+# Redis for caching/rate limiting
 redis==5.0.1
 
-# Optional: Monitoring
+# Monitoring
 prometheus-client==0.19.0
 
+# Retry logic
 tenacity==8.2.3
-
-asyncio>=3.4.3
-aiohttp>=3.8.0
-python-multipart>=0.0.5
-redis>=4.3.4
-hashlib2>=1.3.1
-

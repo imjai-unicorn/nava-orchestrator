@@ -3,10 +3,6 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-# Import your app modules
-from app.config import settings
-from app.dependencies import get_database
-
 # Create FastAPI app
 app = FastAPI(
     title="NAVA Authentication Service",
@@ -17,7 +13,7 @@ app = FastAPI(
 # CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Configure as needed
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

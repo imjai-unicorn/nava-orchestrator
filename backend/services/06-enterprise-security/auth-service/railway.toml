@@ -1,0 +1,24 @@
+# backend/services/06-enterprise-security/auth-service/railway.toml
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "Dockerfile"
+
+[deploy]
+healthcheckPath = "/health"
+healthcheckTimeout = 300
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 3
+
+[environments.production]
+serviceId = "auth-service-production"
+
+[environments.production.variables]
+PORT = "8007"
+SERVICE_NAME = "auth-service"
+ENVIRONMENT = "production"
+LOG_LEVEL = "INFO"
+SECURITY_HEADERS_ENABLED = "true"
+CORS_CREDENTIALS = "true"
+RATE_LIMIT_ENABLED = "true"
+AUDIT_LOG_ENABLED = "true"
+DEBUG_MODE = "false"

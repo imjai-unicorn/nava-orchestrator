@@ -3,7 +3,8 @@
 NAVA Logic Controller - Main Logic System
 Pure logic controller for intelligent microservice routing
 """
-
+import os
+import httpx
 import logging
 from typing import Dict, Any, Optional
 from app.core.core import CoreSystem

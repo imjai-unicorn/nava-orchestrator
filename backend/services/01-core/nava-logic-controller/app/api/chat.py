@@ -148,20 +148,38 @@ async def enhanced_chat(request: EnhancedChatRequest, background_tasks: Backgrou
         if request.context:
             enhanced_context.update(request.context)
         
-        # Process through NAVA orchestrator
+        # Process through NAVA orchestrator - SIMPLIFIED VERSION
         try:
-            from ..service.logic_orchestrator import LogicOrchestrator
+            # Try to import workflow orchestrator
             from ..core.workflow_orchestrator import workflow_orchestrator
             
-            # Use appropriate orchestrator based on complexity
+            # Use appropriate workflow based on complexity
             if request.workflow_type == "simple":
                 result = await workflow_orchestrator.execute_simple_workflow(
                     message=request.message,
                     user_id=request.user_id
                 )
             else:
-                # Try enhanced orchestrator
+                # Try sequential workflow for complex requests
+                try:
+                    result = await workflow_orchestrator.execute_sequential_workflow(
+                        message=request.message,
+                        user_id=request.user_id
+                    )
+                except AttributeError:
+                    # Fallback to simple workflow if sequential doesn't exist
+                    result = await workflow_orchestrator.execute_simple_workflow(
+                        message=request.message,
+                        user_id=request.user_id
+                    )
+                    
+        except ImportError:
+            # If workflow orchestrator not available, try logic orchestrator
+            logger.warning("Workflow orchestrator not found, trying logic orchestrator")
+            try:
+                from ..service.logic_orchestrator import LogicOrchestrator
                 orchestrator = LogicOrchestrator()
+                
                 if hasattr(orchestrator, 'process_request'):
                     result = await orchestrator.process_request(
                         message=request.message,
@@ -169,22 +187,36 @@ async def enhanced_chat(request: EnhancedChatRequest, background_tasks: Backgrou
                         context=enhanced_context
                     )
                 else:
-                    # Fallback to workflow orchestrator
-                    result = await workflow_orchestrator.execute_sequential_workflow(
-                        message=request.message,
-                        user_id=request.user_id
-                    )
-                    
+                    # Emergency fallback
+                    result = {
+                        "response": f"I understand you're asking: {request.message}. How can I help you with that?",
+                        "model_used": "logic_orchestrator_fallback",
+                        "confidence": 0.7,
+                        "processing_time_seconds": 0.1,
+                        "workflow_used": False,
+                        "decision_info": {"method": "logic_orchestrator_fallback"}
+                    }
+            except ImportError:
+                # Ultimate emergency fallback
+                logger.error("No orchestrator available, using emergency fallback")
+                result = {
+                    "response": f"I received your message: {request.message}. I'm processing it now.",
+                    "model_used": "emergency_fallback",
+                    "confidence": 0.5,
+                    "processing_time_seconds": 0.1,
+                    "workflow_used": False,
+                    "decision_info": {"method": "emergency_fallback", "reason": "no_orchestrator"}
+                }
         except Exception as e:
             logger.error(f"❌ Orchestrator error: {e}")
-            # Emergency fallback
+            # Emergency fallback for any other error
             result = {
                 "response": f"I understand you're asking about: {request.message}. Let me help you with that.",
-                "model_used": "emergency_fallback",
-                "confidence": 0.7,
+                "model_used": "error_fallback",
+                "confidence": 0.6,
                 "processing_time_seconds": 0.1,
                 "workflow_used": False,
-                "decision_info": {"method": "emergency_fallback", "error": str(e)}
+                "decision_info": {"method": "error_fallback", "error": str(e)}
             }
         
         # Generate response
@@ -217,7 +249,7 @@ async def enhanced_chat(request: EnhancedChatRequest, background_tasks: Backgrou
             }
         )
         
-        # Background tasks
+        # Background tasks - SIMPLIFIED
         background_tasks.add_task(_log_chat_interaction, request, response)
         
         return response
@@ -481,41 +513,81 @@ async def quick_chat(message: str, user_id: str = "anonymous", model_preference:
 
 @chat_router.post("/analyze")
 async def analyze_message(message: str, analysis_type: str = "complexity"):
-    """Analyze message without generating response"""
+    """Analyze message without generating response - SIMPLIFIED VERSION"""
     
     try:
-        from ..core.complexity_analyzer import complexity_analyzer
-        from ..core.decision_engine import decision_engine
-        
         analysis_result = {}
         
+        # Try complexity analysis
         if analysis_type == "complexity":
             try:
+                from ..core.complexity_analyzer import complexity_analyzer
                 analysis_result["complexity"] = complexity_analyzer.analyze_complexity(message)
-            except:
-                analysis_result["complexity"] = {"level": "medium", "score": 0.5}
+            except (ImportError, AttributeError):
+                # Fallback complexity analysis
+                message_length = len(message)
+                if message_length < 50:
+                    complexity_level = "low"
+                    complexity_score = 0.3
+                elif message_length < 200:
+                    complexity_level = "medium" 
+                    complexity_score = 0.6
+                else:
+                    complexity_level = "high"
+                    complexity_score = 0.9
+                    
+                analysis_result["complexity"] = {
+                    "level": complexity_level, 
+                    "score": complexity_score,
+                    "method": "fallback_length_based"
+                }
         
+        # Try decision analysis
         if analysis_type == "decision" or analysis_type == "all":
             try:
+                from ..core.decision_engine import decision_engine
                 model, confidence, reasoning = decision_engine.select_model(message)
                 analysis_result["model_selection"] = {
                     "recommended_model": model,
                     "confidence": confidence,
                     "reasoning": reasoning
                 }
-            except:
+            except (ImportError, AttributeError):
+                # Fallback model selection
+                if "code" in message.lower() or "programming" in message.lower():
+                    recommended_model = "gpt"
+                elif "creative" in message.lower() or "story" in message.lower():
+                    recommended_model = "claude"
+                else:
+                    recommended_model = "gpt"
+                    
                 analysis_result["model_selection"] = {
-                    "recommended_model": "gpt",
-                    "confidence": 0.8,
-                    "reasoning": {"method": "fallback"}
+                    "recommended_model": recommended_model,
+                    "confidence": 0.7,
+                    "reasoning": {"method": "fallback_keyword_based"}
                 }
         
+        # Try behavior analysis
         if analysis_type == "behavior" or analysis_type == "all":
             try:
+                from ..core.decision_engine import decision_engine
                 patterns = decision_engine.get_behavior_patterns()
                 analysis_result["behavior_patterns"] = patterns["patterns"]
-            except:
-                analysis_result["behavior_patterns"] = {"detected": "conversation"}
+            except (ImportError, AttributeError):
+                # Fallback behavior detection
+                if "?" in message:
+                    detected_pattern = "question"
+                elif "help" in message.lower():
+                    detected_pattern = "assistance"
+                elif len(message) > 100:
+                    detected_pattern = "detailed_conversation"
+                else:
+                    detected_pattern = "simple_conversation"
+                    
+                analysis_result["behavior_patterns"] = {
+                    "detected": detected_pattern,
+                    "method": "fallback_pattern_matching"
+                }
         
         return {
             "message": message,
@@ -530,6 +602,13 @@ async def analyze_message(message: str, analysis_type: str = "complexity"):
             "message": message,
             "analysis_type": analysis_type,
             "error": str(e),
+            "fallback_analysis": {
+                "basic_info": {
+                    "length": len(message),
+                    "has_question": "?" in message,
+                    "estimated_complexity": "medium"
+                }
+            },
             "timestamp": datetime.now().isoformat()
         }
 
@@ -561,7 +640,7 @@ async def get_chat_stats():
         return {"error": str(e)}
 
 async def _log_chat_interaction(request: EnhancedChatRequest, response: ChatResponse):
-    """Background task to log chat interaction"""
+    """Background task to log chat interaction - SIMPLIFIED VERSION"""
     try:
         # Log interaction for analytics
         logger.info(
@@ -571,15 +650,18 @@ async def _log_chat_interaction(request: EnhancedChatRequest, response: ChatResp
             f"time={response.processing_time_seconds:.2f}s"
         )
         
-        # Record metrics for learning system
+        # Try to record metrics for learning system (optional)
         try:
             from ..service.learning_engine import learning_engine
-            await learning_engine.process_feedback(
-                model_used=response.model_used,
-                pattern="conversation",
-                feedback_score=response.confidence,
-                response_time=response.processing_time_seconds
-            )
+            if hasattr(learning_engine, 'process_feedback'):
+                await learning_engine.process_feedback(
+                    model_used=response.model_used,
+                    pattern="conversation",
+                    feedback_score=response.confidence,
+                    response_time=response.processing_time_seconds
+                )
+        except (ImportError, AttributeError) as e:
+            logger.debug(f"Learning system not available: {e}")
         except Exception as e:
             logger.debug(f"Learning system logging failed: {e}")
             

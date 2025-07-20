@@ -6,7 +6,7 @@ FIXED: Removed ALL recursive method calls
 
 import logging
 import httpx
-import asyncio
+import os
 from typing import Dict, Any, Optional
 from datetime import datetime
 import asyncio
@@ -52,13 +52,11 @@ class RealAIClient:
     """
     
     def __init__(self, service_discovery=None):
-        self.service_discovery = service_discovery
-        
         # AI service endpoints
         self.services = {
-            "gpt": "http://localhost:8002",
-            "claude": "http://localhost:8003", 
-            "gemini": "http://localhost:8004"
+            "gpt": os.getenv('GPT_SERVICE_URL', 'http://localhost:8002'),
+            "claude": os.getenv('CLAUDE_SERVICE_URL', 'http://localhost:8003'), 
+            "gemini": os.getenv('GEMINI_SERVICE_URL', 'http://localhost:8004')
         }
         
         # HTTP client

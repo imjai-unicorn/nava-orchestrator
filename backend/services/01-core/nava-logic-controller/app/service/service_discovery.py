@@ -2,7 +2,7 @@
 """
 Simple Service Discovery for NAVA
 """
-
+import os
 import logging
 from typing import List, Dict, Any
 
@@ -15,9 +15,9 @@ class ServiceDiscovery:
     
     def __init__(self):
         self.services = {
-            "gpt": {"url": "http://localhost:8002", "status": "unknown"},
-            "claude": {"url": "http://localhost:8003", "status": "unknown"}, 
-            "gemini": {"url": "http://localhost:8004", "status": "unknown"}
+            "gpt": {"url": os.getenv('GPT_SERVICE_URL', 'http://localhost:8002'), "status": "unknown"},
+            "claude": {"url": os.getenv('CLAUDE_SERVICE_URL', 'http://localhost:8003'), "status": "unknown"}, 
+            "gemini": {"url": os.getenv('GEMINI_SERVICE_URL', 'http://localhost:8004'), "status": "unknown"}
         }
         
     def get_available_models(self) -> List[str]:

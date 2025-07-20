@@ -30,8 +30,8 @@ aioredis==2.0.1
 asyncpg==0.29.0
 sqlalchemy[asyncio]==2.0.23
 
-# Hashing and encoding
-hashlib2==1.0.1
+# Hashing and encoding (built-in Python hashlib)
+# hashlib is built-in, no external package needed
 
 # Performance monitoring
 psutil==5.9.5

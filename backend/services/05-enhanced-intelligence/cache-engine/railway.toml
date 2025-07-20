@@ -1,0 +1,12 @@
+# File 4: backend/services/05-enhanced-intelligence/cache-engine/railway.toml
+[build]
+builder = "NIXPACKS"
+
+[deploy]
+startCommand = "python main.py"
+healthcheckPath = "/health"
+healthcheckTimeout = 300
+restartPolicyType = "ON_FAILURE"
+
+[environments.production]
+PORT = 8013

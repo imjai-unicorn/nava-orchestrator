@@ -16,7 +16,7 @@ import json
 logger = logging.getLogger(__name__)
 
 # Create router
-decision_router = APIRouter()
+enhanced_decision_router = APIRouter()
 
 # Models
 class DecisionRequest(BaseModel):
@@ -340,7 +340,7 @@ class EnhancedDecisionEngine:
 # Initialize decision engine
 decision_engine = EnhancedDecisionEngine()
 
-@decision_router.post("/analyze", response_model=DecisionResponse)
+@enhanced_decision_router.post("/analyze", response_model=DecisionResponse)
 async def analyze_decision(request: DecisionRequest):
     """Analyze and make AI model selection decision"""
     
@@ -382,7 +382,7 @@ async def analyze_decision(request: DecisionRequest):
         logger.error(f"❌ Decision analysis error: {e}")
         raise HTTPException(status_code=500, detail=f"Decision analysis failed: {str(e)}")
 
-@decision_router.get("/models")
+@enhanced_decision_router.get("/models")
 async def get_available_models():
     """Get available AI models and their capabilities"""
     
@@ -393,7 +393,7 @@ async def get_available_models():
         "timestamp": datetime.now().isoformat()
     }
 
-@decision_router.get("/patterns")
+@enhanced_decision_router.get("/patterns")
 async def get_behavior_patterns():
     """Get supported behavior patterns"""
     
@@ -403,7 +403,7 @@ async def get_behavior_patterns():
         "timestamp": datetime.now().isoformat()
     }
 
-@decision_router.post("/quick-select")
+@enhanced_decision_router.post("/quick-select")
 async def quick_model_select(message: str, priority: str = "normal"):
     """Quick model selection without full analysis"""
     

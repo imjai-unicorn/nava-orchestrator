@@ -617,9 +617,9 @@ class MultiLayerCache:
         
         # Start cleanup task
         try:
-            loop = asyncio.get_event_loop()
-            loop.create_task(cleanup_expired())
-        except:
+            loop = asyncio.get_running_loop()            
+        except RuntimeError:
+            loop = asyncio.new_event_loop()
             # If no event loop, skip background task
             pass
     

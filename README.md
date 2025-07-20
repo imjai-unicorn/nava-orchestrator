@@ -13,13 +13,13 @@ Intelligent Logic model selection and routing system.
 ## 📊 System Status
 
 **Backend Services:**
-- `nava-logic-controller` → Port 8001 ✅
+- `nava-logic-controller` → Port 8005 ✅
 
 **Database:**
 - Supabase → Connected ✅
 
 **API Documentation:**
-- http://localhost:8001/docs
+- http://localhost:8005/docs
 
 ## 🚀 Quick Start
 

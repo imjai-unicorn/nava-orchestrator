@@ -36,18 +36,18 @@ app.add_middleware(
 
 # Import routers
 try:
-    from app.decision_engine import decision_router
+    from app.enhanced_decision_engine import enhanced_decision_router
     from app.criteria_analyzer import criteria_router
     from app.outcome_predictor import outcome_router
     from app.risk_assessor import risk_router
     
     # Include routers
-    app.include_router(decision_router, prefix="/api/decision", tags=["decision"])
+    app.include_router(enhanced_decision_router, prefix="/api/decision", tags=["decision"])
     app.include_router(criteria_router, prefix="/api/criteria", tags=["criteria"])
     app.include_router(outcome_router, prefix="/api/outcome", tags=["outcome"])
     app.include_router(risk_router, prefix="/api/risk", tags=["risk"])
     
-    logger.info("✅ All decision engine routers loaded successfully")
+    logger.info("✅ Enhanced decision engine router loaded successfully")
     
 except ImportError as e:
     logger.error(f"❌ Router import error: {e}")
@@ -87,8 +87,9 @@ async def health_check():
         "timestamp": datetime.now().isoformat()
     }
 
+# ใน main.py - line สุดท้าย
 if __name__ == "__main__":
-    port = int(os.getenv("PORT", 8008))
+    port = int(os.getenv("PORT", 8008))  # ✅ ถูกแล้ว
     uvicorn.run(
         "main:app",
         host="0.0.0.0",

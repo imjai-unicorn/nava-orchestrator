@@ -1,72 +1,27 @@
-# backend/services/06-enterprise-security/auth-service/requirements.txt
-# Authentication Service Dependencies
-
-# FastAPI and ASGI
+# Core dependencies
 fastapi==0.104.1
 uvicorn==0.24.0
 pydantic==2.5.0
 pydantic-settings==2.1.0
 
-# Authentication and security
+# Authentication & Security
 python-jose[cryptography]==3.3.0
 passlib[bcrypt]==1.7.4
 python-multipart==0.0.6
 bcrypt==4.1.2
-
-# JWT handling
 PyJWT==2.8.0
-cryptography==41.0.8
 
-# Multi-factor authentication
-pyotp==2.9.0
-qrcode==7.4.2
-Pillow==10.1.0
+# Cryptography - updated for Python 3.12 compatibility
+cryptography>=41.0.0,<46.0.0
 
-# Session management
-redis==5.0.1
-aioredis==2.0.1
+# Database
+supabase==2.0.0
+psycopg2-binary==2.9.7
 
-# Database support
-asyncpg==0.29.0
-sqlalchemy[asyncio]==2.0.23
-alembic==1.13.0
-
-# HTTP requests
-httpx==0.25.0
-aiohttp==3.9.0
-
-# Configuration
+# Utils
 python-dotenv==1.0.0
+httpx==0.25.0
 
-# Logging and monitoring
-python-json-logger==2.0.7
-structlog==23.2.0
-
-# Date and time
-python-dateutil==2.8.2
-
-# Email support (for MFA)
-aiosmtplib==3.0.1
-jinja2==3.1.2
-
-# Rate limiting
-slowapi==0.1.9
-limits==3.6.0
-
-# Input validation
-email-validator==2.1.0
-phonenumbers==8.13.26
-
-# Enterprise SSO support
-python-saml==1.15.0
-
-# Performance monitoring
-psutil==5.9.5
-
-# Testing
+# Development & Testing
 pytest==7.4.0
 pytest-asyncio==0.21.0
-httpx==0.25.0
-
-# Type hints
-typing-extensions==4.8.0

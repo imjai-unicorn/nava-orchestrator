@@ -35,3 +35,4 @@ pip install -r requirements.txt
 
 # 3. Run service
 python run.py
+"# Force redeploy" 

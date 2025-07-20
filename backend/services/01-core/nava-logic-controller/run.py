@@ -4,6 +4,7 @@ import uvicorn
 from main import app
 import sys
 from pathlib import Path
+import os
 
 # Add project root to path
 project_root = Path(__file__).parent.parent.parent.parent.parent
@@ -19,7 +20,7 @@ if __name__ == "__main__":
     uvicorn.run(
         "main:app",
         host="127.0.0.1",
-        port=settings.SERVICE_PORT,
+        port=int(os.getenv('PORT', settings.SERVICE_PORT)),
         reload=True,
         log_level="info"
     )

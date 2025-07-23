@@ -1,0 +1,268 @@
+# railway.toml - Agent Registry Service Railway Deployment Configuration
+
+[build]
+builder = "NIXPACKS"
+buildCommand = "pip install -r requirements.txt"
+
+[deploy]
+healthcheckPath = "/health"
+healthcheckTimeout = 300
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 3
+
+# Service Configuration
+[[deploy.environmentVariables]]
+name = "PORT"
+value = "8006"
+
+[[deploy.environmentVariables]]
+name = "ENVIRONMENT"
+value = "production"
+
+[[deploy.environmentVariables]]
+name = "SERVICE_NAME"
+value = "nava-agent-registry"
+
+[[deploy.environmentVariables]]
+name = "DEBUG"
+value = "false"
+
+[[deploy.environmentVariables]]
+name = "LOG_LEVEL"
+value = "INFO"
+
+# Health Check Configuration
+[[deploy.environmentVariables]]
+name = "HEALTH_CHECK_INTERVAL"
+value = "30"
+
+[[deploy.environmentVariables]]
+name = "HEALTH_CHECK_TIMEOUT"
+value = "10"
+
+# AI Services URLs (Production Railway URLs)
+[[deploy.environmentVariables]]
+name = "GPT_CLIENT_URL"
+value = "https://nava-orchestrator-gpt-production.up.railway.app"
+
+[[deploy.environmentVariables]]
+name = "CLAUDE_CLIENT_URL"
+value = "https://nava-orchestrator-claude-production.up.railway.app"
+
+[[deploy.environmentVariables]]
+name = "GEMINI_CLIENT_URL"
+value = "https://nava-orchestrator-gemini-production.up.railway.app"
+
+# Intelligence Services URLs (Production Railway URLs)
+[[deploy.environmentVariables]]
+name = "DECISION_ENGINE_URL"
+value = "https://nava-decision-engine.up.railway.app"
+
+[[deploy.environmentVariables]]
+name = "QUALITY_SERVICE_URL"
+value = "https://nava-quality-service.up.railway.app"
+
+[[deploy.environmentVariables]]
+name = "SLF_FRAMEWORK_URL"
+value = "https://nava-slf-framework.up.railway.app"
+
+[[deploy.environmentVariables]]
+name = "CACHE_ENGINE_URL"
+value = "https://nava-cache-engine.up.railway.app"
+
+# NAVA Core Services URLs
+[[deploy.environmentVariables]]
+name = "NAVA_CORE_URL"
+value = "https://nava-logic-controller.up.railway.app"
+
+[[deploy.environmentVariables]]
+name = "NAVA_GATEWAY_URL"
+value = "https://nava-gateway.up.railway.app"
+
+# Enterprise Services URLs (when deployed)
+[[deploy.environmentVariables]]
+name = "AUTH_SERVICE_URL"
+value = "https://nava-auth-service.up.railway.app"
+
+[[deploy.environmentVariables]]
+name = "AUDIT_SERVICE_URL"
+value = "https://nava-audit-service.up.railway.app"
+
+# Load Balancing Configuration
+[[deploy.environmentVariables]]
+name = "ENABLE_LOAD_BALANCING"
+value = "true"
+
+[[deploy.environmentVariables]]
+name = "MAX_CONCURRENT_REQUESTS_PER_SERVICE"
+value = "10"
+
+[[deploy.environmentVariables]]
+name = "GLOBAL_MAX_CONCURRENT_REQUESTS"
+value = "100"
+
+# Circuit Breaker Configuration
+[[deploy.environmentVariables]]
+name = "CIRCUIT_BREAKER_ENABLED"
+value = "true"
+
+[[deploy.environmentVariables]]
+name = "CIRCUIT_BREAKER_FAILURE_THRESHOLD"
+value = "5"
+
+[[deploy.environmentVariables]]
+name = "CIRCUIT_BREAKER_TIMEOUT"
+value = "60"
+
+# Performance Configuration
+[[deploy.environmentVariables]]
+name = "ENABLE_PERFORMANCE_MONITORING"
+value = "true"
+
+[[deploy.environmentVariables]]
+name = "TRACK_RESPONSE_TIMES"
+value = "true"
+
+[[deploy.environmentVariables]]
+name = "TRACK_SUCCESS_RATES"
+value = "true"
+
+# Caching Configuration
+[[deploy.environmentVariables]]
+name = "ENABLE_REGISTRY_CACHE"
+value = "true"
+
+[[deploy.environmentVariables]]
+name = "CACHE_TTL_SECONDS"
+value = "300"
+
+# Security Configuration
+[[deploy.environmentVariables]]
+name = "ENABLE_API_KEY_AUTH"
+value = "false"
+
+[[deploy.environmentVariables]]
+name = "RATE_LIMIT_ENABLED"
+value = "true"
+
+[[deploy.environmentVariables]]
+name = "RATE_LIMIT_REQUESTS_PER_MINUTE"
+value = "1000"
+
+# Enterprise Features
+[[deploy.environmentVariables]]
+name = "ENABLE_AUDIT_LOGGING"
+value = "true"
+
+[[deploy.environmentVariables]]
+name = "ENABLE_COMPLIANCE_TRACKING"
+value = "true"
+
+[[deploy.environmentVariables]]
+name = "ENABLE_ANALYTICS"
+value = "true"
+
+# Alerting Configuration
+[[deploy.environmentVariables]]
+name = "ENABLE_HEALTH_ALERTS"
+value = "true"
+
+[[deploy.environmentVariables]]
+name = "ENABLE_PERFORMANCE_ALERTS"
+value = "true"
+
+[[deploy.environmentVariables]]
+name = "RESPONSE_TIME_ALERT_THRESHOLD_MS"
+value = "3000"
+
+[[deploy.environmentVariables]]
+name = "ERROR_RATE_ALERT_THRESHOLD"
+value = "0.05"
+
+# Service Discovery Configuration
+[[deploy.environmentVariables]]
+name = "ENABLE_AUTO_DISCOVERY"
+value = "true"
+
+[[deploy.environmentVariables]]
+name = "DISCOVERY_INTERVAL_SECONDS"
+value = "60"
+
+[[deploy.environmentVariables]]
+name = "AUTO_REGISTER_HEALTHY_SERVICES"
+value = "true"
+
+# Future Local AI Configuration (Phase 4 Ready)
+[[deploy.environmentVariables]]
+name = "ENABLE_LOCAL_AI_SUPPORT"
+value = "true"
+
+[[deploy.environmentVariables]]
+name = "LOCAL_AI_PRIORITY"
+value = "1"
+
+# Database Configuration (Secrets - set in Railway Dashboard)
+# These should be set as Railway secrets, not in this file:
+# - DATABASE_URL
+# - SUPABASE_URL  
+# - SUPABASE_ANON_KEY
+# - SUPABASE_SERVICE_ROLE_KEY
+# - REDIS_URL (if using external Redis)
+
+# Optional Redis Configuration
+[[deploy.environmentVariables]]
+name = "REDIS_DB"
+value = "3"
+
+[[deploy.environmentVariables]]
+name = "REDIS_KEY_PREFIX"
+value = "agent_registry:"
+
+# Production Optimization
+[[deploy.environmentVariables]]
+name = "WORKERS"
+value = "1"
+
+[[deploy.environmentVariables]]
+name = "MAX_CONNECTIONS"
+value = "100"
+
+[[deploy.environmentVariables]]
+name = "KEEP_ALIVE_TIMEOUT"
+value = "30"
+
+# API Configuration
+[[deploy.environmentVariables]]
+name = "API_PREFIX"
+value = "/api"
+
+[[deploy.environmentVariables]]
+name = "DOCS_URL"
+value = "/docs"
+
+[[deploy.environmentVariables]]
+name = "REDOC_URL"
+value = "/redoc"
+
+# CORS Configuration (Production)
+[[deploy.environmentVariables]]
+name = "CORS_ORIGINS"
+value = "https://nava-customer-chat.up.railway.app,https://nava-developer-dashboard.up.railway.app,https://nava-enterprise-console.up.railway.app"
+
+[[deploy.environmentVariables]]
+name = "CORS_CREDENTIALS"
+value = "true"
+
+# Monitoring Endpoints
+[[deploy.environmentVariables]]
+name = "ENABLE_PROMETHEUS"
+value = "true"
+
+[[deploy.environmentVariables]]
+name = "METRICS_PORT"
+value = "9006"
+
+# Build Configuration
+[build.environment]
+PYTHON_VERSION = "3.11"
+PIP_VERSION = "23.3.1"

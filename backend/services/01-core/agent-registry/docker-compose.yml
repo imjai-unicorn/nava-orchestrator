@@ -1,0 +1,240 @@
+# docker-compose.yml - Agent Registry Local Development
+version: '3.8'
+
+services:
+  # Agent Registry Service
+  agent-registry:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    container_name: nava-agent-registry
+    ports:
+      - "8006:8006"
+    environment:
+      - PORT=8006
+      - ENVIRONMENT=development
+      - DEBUG=true
+      - LOG_LEVEL=INFO
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+      - /app/node_modules
+    depends_on:
+      - redis
+    networks:
+      - nava-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8006/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # NAVA Logic Controller (dependency)
+  nava-logic-controller:
+    build:
+      context: ../nava-logic-controller
+      dockerfile: Dockerfile
+    container_name: nava-logic-controller
+    ports:
+      - "8005:8005"
+    environment:
+      - PORT=8005
+      - ENVIRONMENT=development
+      - AGENT_REGISTRY_URL=http://agent-registry:8006
+    env_file:
+      - ../nava-logic-controller/.env
+    depends_on:
+      - agent-registry
+      - redis
+    networks:
+      - nava-network
+    restart: unless-stopped
+    profiles:
+      - with-controller
+
+  # Redis for caching and health monitoring
+  redis:
+    image: redis:7-alpine
+    container_name: nava-redis-registry
+    ports:
+      - "6380:6379"  # Different port to avoid conflicts
+    volumes:
+      - redis_registry_data:/data
+    networks:
+      - nava-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # AI Services for health monitoring (mock services for testing)
+  mock-gpt-service:
+    image: nginx:alpine
+    container_name: mock-gpt-service
+    ports:
+      - "8002:80"
+    volumes:
+      - ./mock_services/gpt:/usr/share/nginx/html
+    networks:
+      - nava-network
+    restart: unless-stopped
+    profiles:
+      - mock-services
+
+  mock-claude-service:
+    image: nginx:alpine
+    container_name: mock-claude-service
+    ports:
+      - "8003:80"
+    volumes:
+      - ./mock_services/claude:/usr/share/nginx/html
+    networks:
+      - nava-network
+    restart: unless-stopped
+    profiles:
+      - mock-services
+
+  mock-gemini-service:
+    image: nginx:alpine
+    container_name: mock-gemini-service
+    ports:
+      - "8004:80"
+    volumes:
+      - ./mock_services/gemini:/usr/share/nginx/html
+    networks:
+      - nava-network
+    restart: unless-stopped
+    profiles:
+      - mock-services
+
+  # Intelligence Services for monitoring
+  mock-decision-engine:
+    image: nginx:alpine
+    container_name: mock-decision-engine
+    ports:
+      - "8008:80"
+    volumes:
+      - ./mock_services/decision:/usr/share/nginx/html
+    networks:
+      - nava-network
+    restart: unless-stopped
+    profiles:
+      - mock-services
+
+  mock-quality-service:
+    image: nginx:alpine
+    container_name: mock-quality-service
+    ports:
+      - "8009:80"
+    volumes:
+      - ./mock_services/quality:/usr/share/nginx/html
+    networks:
+      - nava-network
+    restart: unless-stopped
+    profiles:
+      - mock-services
+
+  mock-slf-framework:
+    image: nginx:alpine
+    container_name: mock-slf-framework
+    ports:
+      - "8010:80"
+    volumes:
+      - ./mock_services/slf:/usr/share/nginx/html
+    networks:
+      - nava-network
+    restart: unless-stopped
+    profiles:
+      - mock-services
+
+  mock-cache-engine:
+    image: nginx:alpine
+    container_name: mock-cache-engine
+    ports:
+      - "8013:80"
+    volumes:
+      - ./mock_services/cache:/usr/share/nginx/html
+    networks:
+      - nava-network
+    restart: unless-stopped
+    profiles:
+      - mock-services
+
+  # Future Local AI Services (ready for Phase 4)
+  mock-phi3-service:
+    image: nginx:alpine
+    container_name: mock-phi3-service
+    ports:
+      - "8019:80"
+    volumes:
+      - ./mock_services/phi3:/usr/share/nginx/html
+    networks:
+      - nava-network
+    restart: unless-stopped
+    profiles:
+      - local-ai-mock
+
+  mock-deepseek-service:
+    image: nginx:alpine
+    container_name: mock-deepseek-service
+    ports:
+      - "8020:80"
+    volumes:
+      - ./mock_services/deepseek:/usr/share/nginx/html
+    networks:
+      - nava-network
+    restart: unless-stopped
+    profiles:
+      - local-ai-mock
+
+# Networks
+networks:
+  nava-network:
+    driver: bridge
+    name: nava-registry-network
+
+# Volumes
+volumes:
+  redis_registry_data:
+    name: nava-redis-registry-data
+
+# Development helpers
+x-development-commands: &dev-commands
+  # Start only Agent Registry + Redis
+  registry-only: |
+    docker-compose up agent-registry redis
+  
+  # Start with NAVA Controller
+  with-controller: |
+    docker-compose --profile with-controller up
+  
+  # Start with mock AI services for testing
+  with-mocks: |
+    docker-compose --profile mock-services up
+  
+  # Start with local AI mocks (Phase 4)
+  with-local-ai: |
+    docker-compose --profile local-ai-mock up
+  
+  # Full development environment
+  full-dev: |
+    docker-compose --profile with-controller --profile mock-services up
+  
+  # Test environment (registry + mocks only)
+  test-env: |
+    docker-compose up agent-registry redis --profile mock-services
+  
+  # Clean up
+  clean: |
+    docker-compose down -v --remove-orphans
+  
+  # Health check all services
+  health-check: |
+    docker-compose ps
+    curl -f http://localhost:8006/health
+    curl -f http://localhost:8006/api/services

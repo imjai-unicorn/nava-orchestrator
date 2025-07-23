@@ -1,0 +1,248 @@
+# .dockerignore - Agent Registry Service
+
+# Python cache and bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+.venv/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Testing and coverage
+.tox/
+.coverage
+.coverage.*
+.cache
+.pytest_cache/
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+htmlcov/
+
+# Environment files (security)
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+.env.*.local
+
+# Logs
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Database files
+*.sqlite
+*.sqlite3
+*.db
+
+# Documentation
+docs/_build/
+.sphinx/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# pyenv
+.python-version
+
+# Celery
+celerybeat-schedule
+celerybeat.pid
+
+# SageMath parsed files
+*.sage.py
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Docker
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+
+# Node.js (if any frontend assets)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.npm
+.eslintcache
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+.tmp/
+.temp/
+
+# Backup files
+*.bak
+*.backup
+*~
+
+# Local development
+.local/
+.cache/
+
+# Testing artifacts
+.coverage
+htmlcov/
+.pytest_cache/
+test-results/
+test-reports/
+
+# Build artifacts
+build/
+dist/
+*.tar.gz
+
+# Railway specific
+.railway/
+
+# Mock services directory (for testing)
+mock_services/
+
+# Health check logs
+health_check_logs/
+
+# Service registry data
+registry_data/
+service_cache/
+
+# Performance monitoring
+performance_data/
+metrics_data/
+
+# Load balancing data
+load_balancing_logs/
+traffic_data/
+
+# Security keys (if any)
+*.pem
+*.key
+*.crt
+*.cert
+
+# Development scripts
+dev_scripts/
+setup_scripts/
+
+# Documentation generation
+docs_build/
+api_docs/
+
+# Local configuration
+local_config/
+dev_config/
+
+# Archived files
+*.zip
+*.tar
+*.gz
+*.rar
+
+# IDE workspace files
+*.code-workspace
+.vscode/settings.json
+.vscode/launch.json
+
+# Python specific
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Local secrets (additional protection)
+secrets/
+private/
+confidential/
+
+# Experimental code
+experimental/
+sandbox/
+playground/
+
+# Compiled translations
+*.mo
+*.pot
+
+# Local media files
+media/
+uploads/
+static_files/
+
+# Agent Registry specific
+agent_data/
+service_health_logs/
+failover_logs/
+circuit_breaker_data/
+
+# Local AI model files (when Phase 4 comes)
+local_models/
+model_cache/
+*.bin
+*.safetensors
+
+# Monitoring exports
+monitoring_exports/
+health_reports/
+service_reports/

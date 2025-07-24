@@ -25,4 +25,5 @@ structlog
 orjson
 
 redis
-prometheus-client
+prometheus-clientpython-jose[cryptography] 
+asyncpg 

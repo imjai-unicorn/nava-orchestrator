@@ -442,7 +442,7 @@ async def register_local_ai_service(
     local_service = AIService(
         id=service_id,
         name=name,
-        url=f"http://localhost:{port}",
+        url=f"http://localhost:{port}", 
         port=port,
         service_type=ServiceType.LOCAL_AI,
         models=models,

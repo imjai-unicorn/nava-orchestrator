@@ -15,6 +15,7 @@ from enum import Enum
 from dataclasses import dataclass, asdict
 import aiohttp
 import json
+import os
 
 logger = logging.getLogger(__name__)
 
@@ -92,7 +93,7 @@ class AgentRegistry:
         gpt_service = AIService(
             id="gpt-client",
             name="OpenAI GPT",
-            url="http://localhost:8002",
+            url=os.getenv("GPT_SERVICE_URL", "https://nava-orchestrator-gpt-production.up.railway.app"),
             port=8002,
             service_type=ServiceType.EXTERNAL_AI,
             models=["gpt-3.5-turbo", "gpt-4", "gpt-4o"],
@@ -106,7 +107,7 @@ class AgentRegistry:
         claude_service = AIService(
             id="claude-client", 
             name="Anthropic Claude",
-            url="http://localhost:8003",
+            url=os.getenv("CLAUDE_SERVICE_URL", "https://nava-orchestrator-claude-production.up.railway.app"),
             port=8003,
             service_type=ServiceType.EXTERNAL_AI,
             models=["claude-3-haiku-20240307", "claude-3-5-sonnet-20241022"],
@@ -120,7 +121,7 @@ class AgentRegistry:
         gemini_service = AIService(
             id="gemini-client",
             name="Google Gemini",
-            url="http://localhost:8004", 
+            url=os.getenv("GEMINI_SERVICE_URL", "https://nava-orchestrator-gemini-production.up.railway.app"), 
             port=8004,
             service_type=ServiceType.EXTERNAL_AI,
             models=["gemini-2.0-flash-exp", "gemini-2.5-pro"],
